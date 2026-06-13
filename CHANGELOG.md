@@ -6,6 +6,11 @@ versioning.
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-06-13
+
+### Changed
+- Reproducible-build hardening: pin the JDK toolchain to 17 so release builds are byte-for-byte identical across environments — a prerequisite for F-Droid's reproducible, developer-signed builds.
+
 ## [0.5.0] - 2026-06-13
 
 ### Added

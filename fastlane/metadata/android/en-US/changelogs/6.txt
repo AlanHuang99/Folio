@@ -1,0 +1,1 @@
+Build reproducibility: the app now builds byte-for-byte identically across environments (pinned JDK toolchain), a prerequisite for F-Droid's reproducible, developer-signed builds. No user-facing changes.

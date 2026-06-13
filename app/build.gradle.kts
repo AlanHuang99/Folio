@@ -16,8 +16,8 @@ android {
         applicationId = "com.folio.reader"
         minSdk = 26
         targetSdk = 34
-        versionCode = 5
-        versionName = "0.5.0"
+        versionCode = 6
+        versionName = "0.6.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -84,6 +84,12 @@ android {
         includeInApk = false
         includeInBundle = false
     }
+}
+
+// F-Droid reproducibility: pin the JDK toolchain so every build environment (local,
+// GitHub CI, F-Droid) compiles with the same JDK, removing a source of byte differences.
+kotlin {
+    jvmToolchain(17)
 }
 
 // F-Droid reproducibility: the ART/baseline profile (assets/dexopt/baseline.prof)
