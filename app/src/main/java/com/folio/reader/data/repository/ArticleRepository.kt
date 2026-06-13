@@ -41,6 +41,10 @@ class ArticleRepository @Inject constructor(
         return Page(articles, response.continuation)
     }
 
+    /** A window of recent articles across all feeds, for client-side search. */
+    suspend fun loadRecent(count: Int = 200): List<Article> =
+        loadStream(GReaderEndpoints.STREAM_READING_LIST, excludeRead = false, continuation = null, count = count).articles
+
     /** Record the visible ordered list so the reader can page through siblings. */
     fun setReaderContext(articles: List<Article>) {
         articles.forEach { cache[it.id] = it }
