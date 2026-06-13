@@ -1,0 +1,1 @@
+Background sync and offline-resilient reading: marking items read or starred now works offline and syncs automatically when you reconnect. Adds an unread badge and a Settings screen with light/dark and Material You themes.

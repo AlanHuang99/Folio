@@ -13,6 +13,12 @@
 -dontwarn okhttp3.**
 -dontwarn okio.**
 
+# WorkManager instantiates workers by class name via reflection; keep the
+# subclass and its (Context, WorkerParameters) constructor so R8 doesn't break sync.
+-keep class * extends androidx.work.ListenableWorker {
+    <init>(android.content.Context, androidx.work.WorkerParameters);
+}
+
 # Reproducible builds: R8's ServiceLoader optimization builds a static service
 # list whose order can vary between builds, breaking byte-for-byte
 # reproducibility. Keep the coroutines ServiceLoader interfaces so R8 leaves the

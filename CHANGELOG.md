@@ -6,6 +6,13 @@ versioning.
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-06-13
+
+### Added
+- Background sync and offline-resilient read/star: changes are queued locally and sync automatically when the connection returns (WorkManager).
+- Unread count badge on the Unread tab.
+- Settings screen: account info, appearance (System/Light/Dark theme + Material You), version, and sign out.
+
 ## [0.2.0] - 2026-06-13
 
 ### Added
