@@ -138,6 +138,12 @@ dependencies {
     // HTML parsing for the reader view
     implementation(libs.jsoup)
 
+    // Local persistence (Room) + background sync (WorkManager)
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
+    implementation(libs.androidx.work.runtime)
+
     // Unit tests (JVM)
     testImplementation(libs.junit)
 }

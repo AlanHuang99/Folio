@@ -3,6 +3,9 @@ package com.folio.reader.data.repository
 import com.folio.reader.data.api.GReaderApi
 import com.folio.reader.data.api.GReaderEndpoints
 import com.folio.reader.data.api.ServerSession
+import com.folio.reader.data.db.PendingAction
+import com.folio.reader.data.db.PendingActionDao
+import com.folio.reader.data.sync.SyncScheduler
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -11,6 +14,8 @@ import javax.inject.Singleton
 class ArticleRepository @Inject constructor(
     private val api: GReaderApi,
     private val session: ServerSession,
+    private val pendingDao: PendingActionDao,
+    private val syncScheduler: SyncScheduler,
 ) {
     data class Page(val articles: List<Article>, val continuation: String?)
 
@@ -50,7 +55,6 @@ class ArticleRepository @Inject constructor(
         cache[article.id] = article
     }
 
-    /** Fetch a single article by id (used when the cache is cold, e.g. after process death). */
     suspend fun fetchArticle(id: String): Article? {
         val article = runCatching {
             api.itemContents(id).items.orEmpty().firstOrNull()?.let(ArticleMapper::toArticle)
@@ -59,19 +63,41 @@ class ArticleRepository @Inject constructor(
         return article
     }
 
-    suspend fun setRead(itemId: String, read: Boolean): Boolean = editTag(
-        itemId,
-        add = if (read) GReaderEndpoints.TAG_READ else null,
-        remove = if (read) null else GReaderEndpoints.TAG_READ,
-    )
+    // --- Read / star: queued so changes survive offline, flushed by SyncWorker ---
 
-    suspend fun setStarred(itemId: String, starred: Boolean): Boolean = editTag(
-        itemId,
-        add = if (starred) GReaderEndpoints.TAG_STARRED else null,
-        remove = if (starred) null else GReaderEndpoints.TAG_STARRED,
-    )
+    suspend fun setRead(itemId: String, read: Boolean): Boolean =
+        enqueue(itemId, GReaderEndpoints.TAG_READ, read)
 
-    private suspend fun editTag(itemId: String, add: String?, remove: String?): Boolean = try {
+    suspend fun setStarred(itemId: String, starred: Boolean): Boolean =
+        enqueue(itemId, GReaderEndpoints.TAG_STARRED, starred)
+
+    private suspend fun enqueue(itemId: String, tag: String, add: Boolean): Boolean = try {
+        pendingDao.deleteByItemAndTag(itemId, tag)
+        pendingDao.insert(
+            PendingAction(itemId = itemId, tag = tag, add = add, createdAt = System.currentTimeMillis()),
+        )
+        syncScheduler.requestSync()
+        true
+    } catch (e: Exception) {
+        false
+    }
+
+    /** Replay all queued edit-tag actions; returns true if the queue is now empty. */
+    suspend fun flush(): Boolean {
+        val pending = pendingDao.getAll()
+        var allSucceeded = true
+        for (action in pending) {
+            val ok = sendEditTag(
+                action.itemId,
+                add = if (action.add) action.tag else null,
+                remove = if (action.add) null else action.tag,
+            )
+            if (ok) pendingDao.deleteById(action.id) else allSucceeded = false
+        }
+        return allSucceeded
+    }
+
+    private suspend fun sendEditTag(itemId: String, add: String?, remove: String?): Boolean = try {
         api.editTag(itemId, add, remove, writeToken())
         true
     } catch (e: Exception) {

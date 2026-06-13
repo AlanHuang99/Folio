@@ -14,4 +14,7 @@ class SubscriptionRepository @Inject constructor(
         val counts = api.unreadCounts().unreadcounts.orEmpty()
         return SubscriptionMapper.build(subscriptions, counts)
     }
+
+    /** Total unread across all feeds (for the navigation badge); 0 on failure. */
+    suspend fun getTotalUnread(): Int = runCatching { getSubscriptionTree().totalUnread }.getOrDefault(0)
 }
