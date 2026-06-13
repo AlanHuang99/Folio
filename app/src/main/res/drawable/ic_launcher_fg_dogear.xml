@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Clay: a single dog-eared page with a gold fold. -->
+    <path android:fillColor="#FFF7EF" android:strokeColor="#5A2414" android:strokeWidth="1.5"
+        android:pathData="M33,30 L62,30 L74,42 L74,80 L33,80 Z"/>
+    <path android:fillColor="#E6B25C" android:pathData="M62,30 L74,42 L62,42 Z"/>
+    <path android:strokeColor="#5A2414" android:strokeWidth="2.6" android:strokeLineCap="round" android:pathData="M41,52 L66,52"/>
+    <path android:strokeColor="#5A2414" android:strokeWidth="2.6" android:strokeLineCap="round" android:pathData="M41,60 L66,60"/>
+    <path android:strokeColor="#5A2414" android:strokeWidth="2.6" android:strokeLineCap="round" android:pathData="M41,68 L58,68"/>
+</vector>

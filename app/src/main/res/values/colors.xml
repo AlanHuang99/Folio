@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="ic_bg_charcoal">#2A2D31</color>
+    <color name="ic_bg_evergreen">#15564A</color>
+    <color name="ic_bg_slate">#3A4A66</color>
+    <color name="ic_bg_ocean">#143A5A</color>
+    <color name="ic_bg_plum">#5B2E4A</color>
+    <color name="ic_bg_paper">#ECDFC4</color>
+    <color name="ic_bg_clay">#A24A2C</color>
+    <color name="ic_bg_indigo">#1E2440</color>
+    <color name="ic_bg_wine">#6B2233</color>
+</resources>
