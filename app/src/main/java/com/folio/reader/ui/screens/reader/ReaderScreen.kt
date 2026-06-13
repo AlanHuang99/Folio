@@ -14,11 +14,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ChromeReaderMode
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.OpenInBrowser
 import androidx.compose.material.icons.filled.Share
@@ -34,6 +36,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -53,7 +56,7 @@ fun ReaderScreen(viewModel: ReaderViewModel = hiltViewModel()) {
     val context = LocalContext.current
 
     LaunchedEffect(pagerState) {
-        androidx.compose.runtime.snapshotFlow { pagerState.settledPage }.collect { page ->
+        snapshotFlow { pagerState.settledPage }.collect { page ->
             ids.getOrNull(page)?.let { viewModel.markReadOnSettle(it) }
         }
     }
@@ -64,15 +67,18 @@ fun ReaderScreen(viewModel: ReaderViewModel = hiltViewModel()) {
             LaunchedEffect(id) { viewModel.ensureLoaded(id) }
             when (val article = viewModel.article(id)) {
                 null -> Box(Modifier.fillMaxSize(), Alignment.Center) { CircularProgressIndicator() }
-                else -> ArticleContent(article)
+                else -> ArticlePage(article, viewModel.readerMode(id))
             }
         }
 
         val currentId = ids.getOrNull(pagerState.currentPage)
         val current = currentId?.let { viewModel.article(it) }
+        val currentReaderState = currentId?.let { viewModel.readerMode(it) } ?: ReaderModeState.Off
         HorizontalDivider()
         ReaderActionBar(
             article = current,
+            readerState = currentReaderState,
+            onToggleReaderMode = { currentId?.let { viewModel.toggleReaderMode(it) } },
             onToggleStar = { currentId?.let { viewModel.toggleStar(it) } },
             onToggleRead = { currentId?.let { viewModel.toggleRead(it) } },
             onShare = { current?.let { shareArticle(context, it) } },
@@ -82,8 +88,12 @@ fun ReaderScreen(viewModel: ReaderViewModel = hiltViewModel()) {
 }
 
 @Composable
-private fun ArticleContent(article: Article) {
-    val blocks = remember(article.contentHtml) { ArticleHtmlParser.parse(article.contentHtml) }
+private fun ArticlePage(article: Article, readerState: ReaderModeState) {
+    val isLoading = readerState is ReaderModeState.Loading
+    val html = (readerState as? ReaderModeState.Content)?.html ?: article.contentHtml
+    val blocks = remember(html, isLoading) {
+        if (isLoading) emptyList() else ArticleHtmlParser.parse(html)
+    }
     LazyColumn(Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
         item {
             Spacer(Modifier.height(8.dp))
@@ -98,23 +108,49 @@ private fun ArticleContent(article: Article) {
             HorizontalDivider()
             Spacer(Modifier.height(12.dp))
         }
-        if (blocks.isEmpty()) {
+
+        if (isLoading) {
             item {
-                Text(
-                    article.excerpt.ifBlank { "No preview available. Open in browser to read the full article." },
-                    style = MaterialTheme.typography.bodyLarge,
-                )
+                Column(
+                    Modifier.fillMaxWidth().padding(vertical = 48.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    CircularProgressIndicator()
+                    Spacer(Modifier.height(12.dp))
+                    Text(
+                        "Loading full article…",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
             }
         } else {
-            items(blocks) { block ->
-                when (block) {
-                    is ArticleBlock.Text -> {
-                        HtmlText(block.html, Modifier.fillMaxWidth())
-                        Spacer(Modifier.height(12.dp))
-                    }
+            if (readerState is ReaderModeState.Failed) {
+                item {
+                    Text(
+                        "Couldn't load the full article. Showing the feed summary.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.padding(bottom = 12.dp),
+                    )
+                }
+            }
+            if (blocks.isEmpty()) {
+                item {
+                    Text(
+                        article.excerpt.ifBlank { "No preview available. Open in browser to read the full article." },
+                        style = MaterialTheme.typography.bodyLarge,
+                    )
+                }
+            } else {
+                items(blocks) { block ->
+                    when (block) {
+                        is ArticleBlock.Text -> {
+                            HtmlText(block.html, Modifier.fillMaxWidth())
+                            Spacer(Modifier.height(12.dp))
+                        }
 
-                    is ArticleBlock.Image -> {
-                        AsyncImage(
+                        is ArticleBlock.Image -> AsyncImage(
                             model = block.url,
                             contentDescription = null,
                             modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
@@ -131,6 +167,8 @@ private fun ArticleContent(article: Article) {
 @Composable
 private fun ReaderActionBar(
     article: Article?,
+    readerState: ReaderModeState,
+    onToggleReaderMode: () -> Unit,
     onToggleStar: () -> Unit,
     onToggleRead: () -> Unit,
     onShare: () -> Unit,
@@ -138,11 +176,25 @@ private fun ReaderActionBar(
 ) {
     val starred = article?.isStarred == true
     val read = article?.isRead == true
+    val readerActive = readerState is ReaderModeState.Content
+    val readerLoading = readerState is ReaderModeState.Loading
     Row(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically,
     ) {
+        IconButton(onClick = onToggleReaderMode) {
+            if (readerLoading) {
+                CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
+            } else {
+                Icon(
+                    Icons.AutoMirrored.Filled.ChromeReaderMode,
+                    contentDescription = if (readerActive) "Show feed summary" else "Reader mode",
+                    tint = if (readerActive) MaterialTheme.colorScheme.primary
+                    else MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
         IconButton(onClick = onToggleStar) {
             Icon(
                 if (starred) Icons.Filled.Star else Icons.Filled.StarBorder,
