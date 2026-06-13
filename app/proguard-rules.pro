@@ -13,6 +13,10 @@
 -dontwarn okhttp3.**
 -dontwarn okio.**
 
+# readability4j pulls in slf4j-api, which references an optional logging binding
+# that isn't bundled (it falls back to no-op at runtime). Don't fail R8 over it.
+-dontwarn org.slf4j.**
+
 # WorkManager instantiates workers by class name via reflection; keep the
 # subclass and its (Context, WorkerParameters) constructor so R8 doesn't break sync.
 -keep class * extends androidx.work.ListenableWorker {

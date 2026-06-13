@@ -1,0 +1,1 @@
+Reader mode: tap the reader icon while viewing an article to fetch the original page and read the clean, full-text version with images — handy for feeds that only publish a short summary. Tap again to return to the feed text.

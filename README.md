@@ -6,7 +6,7 @@ A clean, open-source Android reader for your self-hosted [FreshRSS](https://fres
 
 Folio connects to a FreshRSS server (or any server that speaks the Google Reader API) and lets you read, organize, and star your feeds. It is built with Jetpack Compose and Material 3, with no proprietary dependencies, no tracking, and no advertising.
 
-> Status: early development (0.3.0). Reading works end to end, with background sync and a settings screen; more lands phase by phase — see [ROADMAP.md](ROADMAP.md).
+> Status: early development (0.4.0). Reading works end to end, with a Safari-style reader mode, background sync, and a settings screen; more lands phase by phase — see [ROADMAP.md](ROADMAP.md).
 
 ## Features
 
@@ -14,6 +14,7 @@ Folio connects to a FreshRSS server (or any server that speaks the Google Reader
 - Browse subscriptions and categories — All, Unread, Starred, by category, by feed
 - An article list with titles, feeds, timestamps, excerpts, thumbnails, and read/unread state, with pull-to-refresh
 - A reader view: article HTML rendered with inline images, swipe to next/previous, share, and open in browser
+- Reader mode: fetch the original page and read the clean, full-text article (for feeds that only publish a summary)
 - Mark read/unread and star, written through to your server
 
 Background sync and offline-resilient read/star (changes queue and sync when the connection returns) are in place. Coming next: full offline reading, search, and a selectable appearance (launcher icon + matching theme).

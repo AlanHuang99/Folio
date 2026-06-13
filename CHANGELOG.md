@@ -6,6 +6,11 @@ versioning.
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-06-13
+
+### Added
+- Reader mode: a Safari-style toggle in the reader that fetches the original article page and shows the clean, full-text content (with images) instead of the feed's summary — useful for feeds that only publish a teaser.
+
 ## [0.3.0] - 2026-06-13
 
 ### Added
