@@ -4,8 +4,8 @@ import android.net.Uri
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -38,6 +38,7 @@ import com.folio.reader.data.api.GReaderEndpoints
 import com.folio.reader.ui.screens.articles.ArticleListScreen
 import com.folio.reader.ui.screens.feeds.FeedsScreen
 import com.folio.reader.ui.screens.reader.ReaderScreen
+import com.folio.reader.ui.screens.settings.SettingsScreen
 
 /**
  * The single app-level Scaffold: a dynamic top bar + bottom navigation + a NavHost.
@@ -54,16 +55,16 @@ fun FolioScaffold(mainViewModel: MainViewModel = hiltViewModel()) {
 
     val isArticles = route?.startsWith("articles/") == true
     val isReader = route?.startsWith("reader/") == true
-    val canGoBack = isArticles || isReader
-    val title = when (route) {
-        FolioTab.Unread.route -> "Unread"
-        FolioTab.Feeds.route -> "Feeds"
-        FolioTab.Starred.route -> "Starred"
-        else -> when {
-            isArticles -> Uri.decode(backStackEntry?.arguments?.getString("title").orEmpty())
-            isReader -> "Article"
-            else -> "Folio"
-        }
+    val isSettings = route == Routes.SETTINGS
+    val canGoBack = isArticles || isReader || isSettings
+    val title = when {
+        route == FolioTab.Unread.route -> "Unread"
+        route == FolioTab.Feeds.route -> "Feeds"
+        route == FolioTab.Starred.route -> "Starred"
+        isSettings -> "Settings"
+        isArticles -> Uri.decode(backStackEntry?.arguments?.getString("title").orEmpty())
+        isReader -> "Article"
+        else -> "Folio"
     }
 
     Scaffold(
@@ -84,9 +85,9 @@ fun FolioScaffold(mainViewModel: MainViewModel = hiltViewModel()) {
                         }
                         DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
                             DropdownMenuItem(
-                                text = { Text("Sign out") },
-                                onClick = { menuOpen = false; mainViewModel.signOut() },
-                                leadingIcon = { Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = null) },
+                                text = { Text("Settings") },
+                                onClick = { menuOpen = false; navController.navigate(Routes.SETTINGS) },
+                                leadingIcon = { Icon(Icons.Filled.Settings, contentDescription = null) },
                             )
                         }
                     }
@@ -94,7 +95,7 @@ fun FolioScaffold(mainViewModel: MainViewModel = hiltViewModel()) {
             )
         },
         bottomBar = {
-            if (!isReader) {
+            if (!isReader && !isSettings) {
                 NavigationBar {
                     FolioTab.entries.forEach { tab ->
                         NavigationBarItem(
@@ -168,6 +169,7 @@ fun FolioScaffold(mainViewModel: MainViewModel = hiltViewModel()) {
             ) {
                 ReaderScreen()
             }
+            composable(Routes.SETTINGS) { SettingsScreen() }
         }
     }
 }

@@ -18,6 +18,7 @@ object Routes {
     // streamId, title, and item id carry slashes/spaces, so they are URL-encoded.
     const val ARTICLES = "articles/{stream}/{title}"
     const val READER = "reader/{id}"
+    const val SETTINGS = "settings"
 
     fun articles(streamId: String, title: String): String =
         "articles/${Uri.encode(streamId)}/${Uri.encode(title)}"
