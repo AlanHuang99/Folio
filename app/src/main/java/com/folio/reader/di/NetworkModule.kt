@@ -13,6 +13,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -51,4 +52,16 @@ object NetworkModule {
     @Singleton
     fun provideGReaderApi(retrofit: Retrofit): GReaderApi =
         retrofit.create(GReaderApi::class.java)
+
+    // A plain client for fetching arbitrary article web pages (reader mode). It
+    // deliberately omits the dynamic-base-URL and auth interceptors, which would
+    // otherwise rewrite the request onto the FreshRSS server.
+    @Provides
+    @Singleton
+    @Named("web")
+    fun provideWebClient(): OkHttpClient =
+        OkHttpClient.Builder()
+            .followRedirects(true)
+            .followSslRedirects(true)
+            .build()
 }

@@ -138,6 +138,9 @@ dependencies {
     // HTML parsing for the reader view
     implementation(libs.jsoup)
 
+    // Reader-mode full-text extraction
+    implementation(libs.readability4j)
+
     // Local persistence (Room) + background sync (WorkManager)
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
