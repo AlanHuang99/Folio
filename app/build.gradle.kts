@@ -16,8 +16,8 @@ android {
         applicationId = "com.folio.reader"
         minSdk = 26
         targetSdk = 34
-        versionCode = 6
-        versionName = "0.6.0"
+        versionCode = 7
+        versionName = "0.6.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -86,11 +86,12 @@ android {
     }
 }
 
-// F-Droid reproducibility: pin the JDK toolchain so every build environment (local,
-// GitHub CI, F-Droid) compiles with the same JDK, removing a source of byte differences.
-kotlin {
-    jvmToolchain(17)
-}
+// F-Droid reproducibility note: do NOT add `kotlin { jvmToolchain(17) }` here.
+// The F-Droid buildserver runs offline with Gradle toolchain auto-provisioning
+// disabled, so a jvmToolchain() request fails to resolve a JDK and the from-source
+// build dies during configuration ("No locally installed toolchains match ...").
+// The compileOptions/kotlinOptions JavaVersion.VERSION_17 above already pin the
+// language and bytecode target, which is what F-Droid (and reproducibility) needs.
 
 // F-Droid reproducibility: the ART/baseline profile (assets/dexopt/baseline.prof)
 // that AGP compiles from merged library profiles is not byte-for-byte

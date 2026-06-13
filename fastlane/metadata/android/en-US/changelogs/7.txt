@@ -1,0 +1,1 @@
+Build fix for from-source (F-Droid) builds: remove the JDK toolchain pin that prevented the app from building in an offline build environment. The build still targets Java 17. No user-facing changes.

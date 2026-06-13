@@ -6,6 +6,11 @@ versioning.
 
 ## [Unreleased]
 
+## [0.6.1] - 2026-06-13
+
+### Fixed
+- Reproducible builds: drop the `jvmToolchain(17)` pin added in 0.6.0. F-Droid's buildserver runs offline with Gradle toolchain auto-provisioning disabled, so that pin made the from-source build fail during configuration. The existing `compileOptions`/`kotlinOptions` already target Java 17. No user-facing changes.
+
 ## [0.6.0] - 2026-06-13
 
 ### Changed
