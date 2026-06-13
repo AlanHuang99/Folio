@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Themed-icon silhouette: the fanned stack as one tinted shape. -->
+    <group android:name="backLeft" android:rotation="-10" android:pivotX="54" android:pivotY="54">
+        <path
+            android:fillColor="#000000"
+            android:pathData="M39,28 h30 a 6,6 0 0,1 6,6 v40 a 6,6 0 0,1 -6,6 h-30 a 6,6 0 0,1 -6,-6 v-40 a 6,6 0 0,1 6,-6 z"/>
+    </group>
+    <group android:name="backRight" android:rotation="10" android:pivotX="54" android:pivotY="54">
+        <path
+            android:fillColor="#000000"
+            android:pathData="M39,28 h30 a 6,6 0 0,1 6,6 v40 a 6,6 0 0,1 -6,6 h-30 a 6,6 0 0,1 -6,-6 v-40 a 6,6 0 0,1 6,-6 z"/>
+    </group>
+    <path
+        android:fillColor="#000000"
+        android:pathData="M39,28 h30 a 6,6 0 0,1 6,6 v40 a 6,6 0 0,1 -6,6 h-30 a 6,6 0 0,1 -6,-6 v-40 a 6,6 0 0,1 6,-6 z"/>
+</vector>

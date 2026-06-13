@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Folio — a fanned stack of pages (Charcoal). Two grey sheets fanned behind a
+         white front sheet with text lines, and a light-grey corner badge. -->
+    <group android:name="backLeft" android:rotation="-10" android:pivotX="54" android:pivotY="54">
+        <path
+            android:fillColor="#8A9099"
+            android:pathData="M39,28 h30 a 6,6 0 0,1 6,6 v40 a 6,6 0 0,1 -6,6 h-30 a 6,6 0 0,1 -6,-6 v-40 a 6,6 0 0,1 6,-6 z"/>
+    </group>
+    <group android:name="backRight" android:rotation="10" android:pivotX="54" android:pivotY="54">
+        <path
+            android:fillColor="#8A9099"
+            android:pathData="M39,28 h30 a 6,6 0 0,1 6,6 v40 a 6,6 0 0,1 -6,6 h-30 a 6,6 0 0,1 -6,-6 v-40 a 6,6 0 0,1 6,-6 z"/>
+    </group>
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M39,28 h30 a 6,6 0 0,1 6,6 v40 a 6,6 0 0,1 -6,6 h-30 a 6,6 0 0,1 -6,-6 v-40 a 6,6 0 0,1 6,-6 z"/>
+    <path
+        android:strokeColor="#2A2D31"
+        android:strokeWidth="2.6"
+        android:strokeLineCap="round"
+        android:pathData="M40,47 L68,47"/>
+    <path
+        android:strokeColor="#2A2D31"
+        android:strokeWidth="2.6"
+        android:strokeLineCap="round"
+        android:pathData="M40,56 L68,56"/>
+    <path
+        android:strokeColor="#2A2D31"
+        android:strokeWidth="2.6"
+        android:strokeLineCap="round"
+        android:pathData="M40,65 L60,65"/>
+    <path
+        android:fillColor="#CDD2D8"
+        android:pathData="M73.5,30 a 4.5,4.5 0 1,0 9,0 a 4.5,4.5 0 1,0 -9,0 z"/>
+</vector>

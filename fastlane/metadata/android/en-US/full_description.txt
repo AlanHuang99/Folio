@@ -1,0 +1,17 @@
+Folio is a reader for self-hosted RSS, built as a clean client for FreshRSS over the Google Reader API. Connect to your own server and read your feeds.
+
+<b>Features</b>
+<ul>
+<li>Connect to a self-hosted FreshRSS server using the Google Reader API</li>
+<li>Browse subscriptions and categories</li>
+<li>Read by All, Unread, Starred, category, or feed</li>
+<li>Article list with feed, time, excerpt, thumbnail, and read state</li>
+<li>A clean reader view with images, share, and open in browser</li>
+<li>Mark read or unread and star, synced back to your server</li>
+<li>Background sync and offline reading</li>
+<li>A selectable appearance: choose the launcher icon and matching theme</li>
+</ul>
+
+Built with Jetpack Compose and Material Design 3.
+
+Folio is free software licensed under the GNU GPLv3, with no proprietary dependencies, no tracking, and no advertising.
