@@ -36,7 +36,7 @@ object SubscriptionMapper {
             val unread = countById[sub.id] ?: 0
             totalUnread += unread
             val node = FeedNode(sub.id, sub.title ?: sub.id, sub.iconUrl, unread)
-            val category = sub.categories.firstOrNull()
+            val category = sub.categories.orEmpty().firstOrNull()
             if (category?.label != null) {
                 feedsByCategory.getOrPut(category.label) { mutableListOf() }.add(node)
                 categoryStreamId[category.label] = category.id

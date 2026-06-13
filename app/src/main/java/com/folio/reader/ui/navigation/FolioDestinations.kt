@@ -15,9 +15,12 @@ enum class FolioTab(val route: String, val label: String, val icon: ImageVector)
 }
 
 object Routes {
-    // streamId and title carry slashes/spaces, so they are URL-encoded into the path.
+    // streamId, title, and item id carry slashes/spaces, so they are URL-encoded.
     const val ARTICLES = "articles/{stream}/{title}"
+    const val READER = "reader/{id}"
 
     fun articles(streamId: String, title: String): String =
         "articles/${Uri.encode(streamId)}/${Uri.encode(title)}"
+
+    fun reader(itemId: String): String = "reader/${Uri.encode(itemId)}"
 }

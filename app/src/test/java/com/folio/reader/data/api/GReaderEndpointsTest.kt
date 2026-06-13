@@ -61,4 +61,21 @@ class GReaderEndpointsTest {
     fun `parseAuthToken trims trailing carriage return`() {
         assertEquals("tok", GReaderEndpoints.parseAuthToken("Auth=tok\r\n"))
     }
+
+    @Test
+    fun `encodeStreamId keeps slashes and simple ids`() {
+        assertEquals("feed/8", GReaderEndpoints.encodeStreamId("feed/8"))
+        assertEquals(
+            "user/-/state/com.google/reading-list",
+            GReaderEndpoints.encodeStreamId("user/-/state/com.google/reading-list"),
+        )
+    }
+
+    @Test
+    fun `encodeStreamId percent-encodes spaces and unsafe chars`() {
+        assertEquals(
+            "user/-/label/My%20News",
+            GReaderEndpoints.encodeStreamId("user/-/label/My News"),
+        )
+    }
 }
