@@ -1,23 +1,18 @@
+<div align="center">
+
+<img src="docs/icon.png" width="96" alt="Folio icon" />
+
 # Folio
 
-A clean, open-source Android reader for your self-hosted [FreshRSS](https://freshrss.org/) server, over the Google Reader API.
+An open-source Android reader for self-hosted [FreshRSS](https://freshrss.org/), over the Google Reader API.
 
-![License: GPL-3.0](https://img.shields.io/badge/License-GPLv3-blue.svg)
+[![Build](https://github.com/AlanHuang99/Folio/actions/workflows/build.yml/badge.svg)](https://github.com/AlanHuang99/Folio/actions/workflows/build.yml)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
+[![Latest release](https://img.shields.io/github/v/release/AlanHuang99/Folio)](https://github.com/AlanHuang99/Folio/releases/latest)
+
+</div>
 
 Folio connects to a FreshRSS server (or any server that speaks the Google Reader API) and lets you read, organize, and star your feeds. It is built with Jetpack Compose and Material 3, with no proprietary dependencies, no tracking, and no advertising.
-
-> Status: early development (0.4.0). Reading works end to end, with a Safari-style reader mode, background sync, and a settings screen; more lands phase by phase — see [ROADMAP.md](ROADMAP.md).
-
-## Features
-
-- Sign in to a self-hosted FreshRSS server with your Google Reader API credentials
-- Browse subscriptions and categories — All, Unread, Starred, by category, by feed
-- An article list with titles, feeds, timestamps, excerpts, thumbnails, and read/unread state, with pull-to-refresh
-- A reader view: article HTML rendered with inline images, swipe to next/previous, share, and open in browser
-- Reader mode: fetch the original page and read the clean, full-text article (for feeds that only publish a summary)
-- Mark read/unread and star, written through to your server
-
-Background sync and offline-resilient read/star (changes queue and sync when the connection returns) are in place. Coming next: full offline reading, search, and a selectable appearance (launcher icon + matching theme).
 
 ## Screenshots
 
@@ -27,18 +22,55 @@ Background sync and offline-resilient read/star (changes queue and sync when the
   <img src="docs/screenshots/3.png" width="30%" alt="Reader" />
 </p>
 
+## Features
+
+- Connect to a self-hosted FreshRSS server with your Google Reader API credentials
+- Browse subscriptions and categories — All, Unread, Starred, by category, by feed — with unread counts and feed icons
+- Article list with title, feed, time, excerpt, thumbnail, and read/unread state; pull-to-refresh and paging
+- Reader view: article HTML rendered to native text with inline images; swipe between articles; star, mark read/unread, share, open in browser
+- Reader mode: fetch the original page and read the clean, full-text article
+- Background sync and offline-resilient read/star — changes queue locally and sync when the connection returns
+- Search recent articles by title, feed, or text
+- Nine selectable looks (in-app theme + matching launcher icon), light/dark, and Material You
+- Free software (GPLv3) — no proprietary dependencies, no tracking, no advertising
+
+## Requirements
+
+- A server that speaks the Google Reader API (for example, [FreshRSS](https://freshrss.org/))
+- Android 8.0 (API 26) or newer
+
+## Install
+
+Download the latest APK from the [Releases](https://github.com/AlanHuang99/Folio/releases/latest) page. Publishing on F-Droid is planned.
+
 ## Build from source
 
-Requirements: JDK 17, the Android SDK, and a device or emulator running Android 8.0 (API 26) or newer.
+Requirements: JDK 17 and the Android SDK.
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/AlanHuang99/Folio.git
 cd Folio
-./gradlew assembleDebug
-./gradlew installDebug   # install on a connected device
+./gradlew assembleDebug          # APK at app/build/outputs/apk/debug/
+./gradlew installDebug           # install on a connected device
 ```
 
-The release build compiles from source without any signing secrets (it produces an unsigned APK that can be signed downstream), which keeps the project friendly to F-Droid-style from-source builds.
+The release build compiles from source without any signing secrets (it produces an unsigned APK that can be signed downstream), which keeps the project friendly to F-Droid-style builds.
+
+## Tech stack
+
+| Area | Libraries |
+|------|-----------|
+| UI | Jetpack Compose, Material 3 |
+| Dependency injection | Hilt |
+| Networking | Retrofit, OkHttp, Gson |
+| Images | Coil |
+| Storage | DataStore, Room |
+| Background work | WorkManager |
+| Reader-mode extraction | readability4j, jsoup |
+
+## Contributing
+
+Issues and pull requests are welcome — please open an issue first for anything substantial. See [CONTRIBUTING.md](CONTRIBUTING.md), and [ROADMAP.md](ROADMAP.md) for planned work.
 
 ## License
 

@@ -97,6 +97,10 @@ tasks.configureEach {
 }
 
 dependencies {
+    // All dependencies are FOSS, and there are no Play Services, Firebase, analytics,
+    // or trackers. AndroidX/Compose/Hilt/Retrofit/OkHttp/Gson/Coil/Room/WorkManager are
+    // Apache-2.0; jsoup is MIT; readability4j is Apache-2.0; JUnit (test only) is EPL-1.0.
+
     // Compose
     val composeBom = platform(libs.compose.bom)
     implementation(composeBom)
