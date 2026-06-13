@@ -151,8 +151,8 @@ fun FolioScaffold(mainViewModel: MainViewModel = hiltViewModel()) {
             composable(
                 route = Routes.READER,
                 arguments = listOf(navArgument("id") { type = NavType.StringType }),
-            ) { entry ->
-                ReaderScreen(itemId = Uri.decode(entry.arguments?.getString("id").orEmpty()))
+            ) {
+                ReaderScreen()
             }
         }
     }

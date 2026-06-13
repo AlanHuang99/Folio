@@ -135,6 +135,9 @@ dependencies {
     // Coroutines
     implementation(libs.kotlinx.coroutines)
 
+    // HTML parsing for the reader view
+    implementation(libs.jsoup)
+
     // Unit tests (JVM)
     testImplementation(libs.junit)
 }

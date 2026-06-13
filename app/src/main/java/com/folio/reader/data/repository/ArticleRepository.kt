@@ -3,6 +3,7 @@ package com.folio.reader.data.repository
 import com.folio.reader.data.api.GReaderApi
 import com.folio.reader.data.api.GReaderEndpoints
 import com.folio.reader.data.api.ServerSession
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -12,6 +13,11 @@ class ArticleRepository @Inject constructor(
     private val session: ServerSession,
 ) {
     data class Page(val articles: List<Article>, val continuation: String?)
+
+    private val cache = ConcurrentHashMap<String, Article>()
+
+    @Volatile
+    private var streamOrder: List<String> = emptyList()
 
     suspend fun loadStream(
         streamId: String,
@@ -25,7 +31,32 @@ class ArticleRepository @Inject constructor(
             continuation = continuation,
             excludeTarget = if (excludeRead) GReaderEndpoints.TAG_READ else null,
         )
-        return Page(response.items.orEmpty().map(ArticleMapper::toArticle), response.continuation)
+        val articles = response.items.orEmpty().map(ArticleMapper::toArticle)
+        articles.forEach { cache[it.id] = it }
+        return Page(articles, response.continuation)
+    }
+
+    /** Record the visible ordered list so the reader can page through siblings. */
+    fun setReaderContext(articles: List<Article>) {
+        articles.forEach { cache[it.id] = it }
+        streamOrder = articles.map { it.id }
+    }
+
+    fun readerOrder(): List<String> = streamOrder
+
+    fun cached(id: String): Article? = cache[id]
+
+    fun updateCache(article: Article) {
+        cache[article.id] = article
+    }
+
+    /** Fetch a single article by id (used when the cache is cold, e.g. after process death). */
+    suspend fun fetchArticle(id: String): Article? {
+        val article = runCatching {
+            api.itemContents(id).items.orEmpty().firstOrNull()?.let(ArticleMapper::toArticle)
+        }.getOrNull()
+        if (article != null) cache[id] = article
+        return article
     }
 
     suspend fun setRead(itemId: String, read: Boolean): Boolean = editTag(

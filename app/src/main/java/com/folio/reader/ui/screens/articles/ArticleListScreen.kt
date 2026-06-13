@@ -84,7 +84,7 @@ fun ArticleListScreen(
                     items(state.articles, key = { it.id }) { article ->
                         ArticleRow(
                             article = article,
-                            onOpen = { viewModel.markReadOnOpen(article); onOpenArticle(article.id) },
+                            onOpen = { viewModel.openArticle(article); onOpenArticle(article.id) },
                             onToggleStar = { viewModel.toggleStar(article) },
                             onToggleRead = { viewModel.toggleRead(article) },
                         )
