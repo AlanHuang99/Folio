@@ -15,4 +15,8 @@ class ServerSession @Inject constructor() {
 
     @Volatile
     var token: String? = null
+
+    // Short-lived POST token for edit-tag / mark-all-as-read; refetched on failure.
+    @Volatile
+    var writeToken: String? = null
 }

@@ -25,4 +25,19 @@ object GReaderEndpoints {
             ?.removePrefix("Auth=")
             ?.trim()
             ?.ifEmpty { null }
+
+    /** Percent-encode a stream id for use as a URL path, keeping '/' separators. */
+    fun encodeStreamId(streamId: String): String {
+        val sb = StringBuilder()
+        for (byte in streamId.toByteArray(Charsets.UTF_8)) {
+            val value = byte.toInt() and 0xFF
+            val c = value.toChar()
+            if (c in 'A'..'Z' || c in 'a'..'z' || c in '0'..'9' || c in "-._~/") {
+                sb.append(c)
+            } else {
+                sb.append('%').append(value.toString(16).uppercase().padStart(2, '0'))
+            }
+        }
+        return sb.toString()
+    }
 }

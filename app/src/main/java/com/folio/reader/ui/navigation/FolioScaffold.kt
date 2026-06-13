@@ -3,6 +3,7 @@ package com.folio.reader.ui.navigation
 import android.net.Uri
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -21,6 +22,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavType
@@ -29,68 +31,107 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.folio.reader.ui.screens.articles.ArticlesScreen
+import com.folio.reader.data.api.GReaderEndpoints
+import com.folio.reader.ui.screens.articles.ArticleListScreen
 import com.folio.reader.ui.screens.feeds.FeedsScreen
+import com.folio.reader.ui.screens.reader.ReaderScreen
 
 /**
- * The single app-level Scaffold: top bar + bottom navigation + a NavHost. Window
- * insets are owned here so child screens stay inset-agnostic.
+ * The single app-level Scaffold: a dynamic top bar + bottom navigation + a NavHost.
+ * Window insets are owned here so child screens stay inset-agnostic.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FolioScaffold(mainViewModel: MainViewModel = hiltViewModel()) {
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = backStackEntry?.destination?.route
+    val route = backStackEntry?.destination?.route
     var menuOpen by remember { mutableStateOf(false) }
+
+    val isArticles = route?.startsWith("articles/") == true
+    val isReader = route?.startsWith("reader/") == true
+    val canGoBack = isArticles || isReader
+    val title = when (route) {
+        FolioTab.Unread.route -> "Unread"
+        FolioTab.Feeds.route -> "Feeds"
+        FolioTab.Starred.route -> "Starred"
+        else -> when {
+            isArticles -> Uri.decode(backStackEntry?.arguments?.getString("title").orEmpty())
+            isReader -> "Article"
+            else -> "Folio"
+        }
+    }
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Folio") },
-                actions = {
-                    IconButton(onClick = { menuOpen = true }) {
-                        Icon(Icons.Filled.MoreVert, contentDescription = "Menu")
+                title = { Text(title, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                navigationIcon = {
+                    if (canGoBack) {
+                        IconButton(onClick = { navController.popBackStack() }) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        }
                     }
-                    DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
-                        DropdownMenuItem(
-                            text = { Text("Sign out") },
-                            onClick = { menuOpen = false; mainViewModel.signOut() },
-                            leadingIcon = { Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = null) },
-                        )
+                },
+                actions = {
+                    if (!canGoBack) {
+                        IconButton(onClick = { menuOpen = true }) {
+                            Icon(Icons.Filled.MoreVert, contentDescription = "Menu")
+                        }
+                        DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
+                            DropdownMenuItem(
+                                text = { Text("Sign out") },
+                                onClick = { menuOpen = false; mainViewModel.signOut() },
+                                leadingIcon = { Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = null) },
+                            )
+                        }
                     }
                 },
             )
         },
         bottomBar = {
-            NavigationBar {
-                FolioTab.entries.forEach { tab ->
-                    NavigationBarItem(
-                        selected = currentRoute == tab.route,
-                        onClick = {
-                            navController.navigate(tab.route) {
-                                popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        },
-                        icon = { Icon(tab.icon, contentDescription = tab.label) },
-                        label = { Text(tab.label) },
-                    )
+            if (!isReader) {
+                NavigationBar {
+                    FolioTab.entries.forEach { tab ->
+                        NavigationBarItem(
+                            selected = route == tab.route,
+                            onClick = {
+                                navController.navigate(tab.route) {
+                                    popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            },
+                            icon = { Icon(tab.icon, contentDescription = tab.label) },
+                            label = { Text(tab.label) },
+                        )
+                    }
                 }
             }
         },
     ) { padding ->
         NavHost(
             navController = navController,
-            startDestination = FolioTab.Feeds.route,
+            startDestination = FolioTab.Unread.route,
             modifier = Modifier.padding(padding),
         ) {
-            composable(FolioTab.Unread.route) { ArticlesScreen(title = "Unread") }
-            composable(FolioTab.Starred.route) { ArticlesScreen(title = "Starred") }
+            composable(FolioTab.Unread.route) {
+                ArticleListScreen(
+                    streamId = GReaderEndpoints.STREAM_READING_LIST,
+                    excludeRead = true,
+                    onOpenArticle = { navController.navigate(Routes.reader(it)) },
+                )
+            }
+            composable(FolioTab.Starred.route) {
+                ArticleListScreen(
+                    streamId = GReaderEndpoints.STREAM_STARRED,
+                    excludeRead = false,
+                    onOpenArticle = { navController.navigate(Routes.reader(it)) },
+                )
+            }
             composable(FolioTab.Feeds.route) {
-                FeedsScreen(onOpenStream = { streamId, title ->
-                    navController.navigate(Routes.articles(streamId, title))
+                FeedsScreen(onOpenStream = { streamId, streamTitle ->
+                    navController.navigate(Routes.articles(streamId, streamTitle))
                 })
             }
             composable(
@@ -100,8 +141,18 @@ fun FolioScaffold(mainViewModel: MainViewModel = hiltViewModel()) {
                     navArgument("title") { type = NavType.StringType },
                 ),
             ) { entry ->
-                val title = Uri.decode(entry.arguments?.getString("title").orEmpty())
-                ArticlesScreen(title = title)
+                val stream = Uri.decode(entry.arguments?.getString("stream").orEmpty())
+                ArticleListScreen(
+                    streamId = stream,
+                    excludeRead = false,
+                    onOpenArticle = { navController.navigate(Routes.reader(it)) },
+                )
+            }
+            composable(
+                route = Routes.READER,
+                arguments = listOf(navArgument("id") { type = NavType.StringType }),
+            ) { entry ->
+                ReaderScreen(itemId = Uri.decode(entry.arguments?.getString("id").orEmpty()))
             }
         }
     }
