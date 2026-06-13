@@ -16,7 +16,15 @@ Folio connects to a FreshRSS server (or any server that speaks the Google Reader
 - A reader view: article HTML rendered with inline images, swipe to next/previous, share, and open in browser
 - Mark read/unread and star, written through to your server
 
-Coming next: background sync and offline reading, search, and a selectable appearance (launcher icon + matching theme).
+Background sync and offline-resilient read/star (changes queue and sync when the connection returns) are in place. Coming next: full offline reading, search, and a selectable appearance (launcher icon + matching theme).
+
+## Screenshots
+
+<p>
+  <img src="docs/screenshots/1.png" width="30%" alt="Subscriptions" />
+  <img src="docs/screenshots/2.png" width="30%" alt="Article list" />
+  <img src="docs/screenshots/3.png" width="30%" alt="Reader" />
+</p>
 
 ## Build from source
 
