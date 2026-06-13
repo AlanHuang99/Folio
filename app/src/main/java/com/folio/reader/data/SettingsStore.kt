@@ -32,6 +32,9 @@ class SettingsStore @Inject constructor(
 
     val themeMode: Flow<String?> = prefs.data.map { it[KEY_THEME_MODE] }
     val dynamicColor: Flow<Boolean> = prefs.data.map { it[KEY_DYNAMIC_COLOR] ?: false }
+    val appearance: Flow<String?> = prefs.data.map { it[KEY_APPEARANCE] }
+    // The appearance whose launcher icon is currently enabled (to avoid redundant switches).
+    val appliedIcon: Flow<String?> = prefs.data.map { it[KEY_APPLIED_ICON] }
 
     suspend fun setThemeMode(mode: String) {
         prefs.edit { it[KEY_THEME_MODE] = mode }
@@ -39,6 +42,14 @@ class SettingsStore @Inject constructor(
 
     suspend fun setDynamicColor(enabled: Boolean) {
         prefs.edit { it[KEY_DYNAMIC_COLOR] = enabled }
+    }
+
+    suspend fun setAppearance(name: String) {
+        prefs.edit { it[KEY_APPEARANCE] = name }
+    }
+
+    suspend fun setAppliedIcon(name: String) {
+        prefs.edit { it[KEY_APPLIED_ICON] = name }
     }
 
     suspend fun saveSession(serverUrl: String, token: String, userName: String) {
@@ -59,5 +70,7 @@ class SettingsStore @Inject constructor(
         private val KEY_USER_NAME = stringPreferencesKey("user_name")
         private val KEY_THEME_MODE = stringPreferencesKey("theme_mode")
         private val KEY_DYNAMIC_COLOR = booleanPreferencesKey("dynamic_color")
+        private val KEY_APPEARANCE = stringPreferencesKey("appearance")
+        private val KEY_APPLIED_ICON = stringPreferencesKey("applied_icon")
     }
 }
