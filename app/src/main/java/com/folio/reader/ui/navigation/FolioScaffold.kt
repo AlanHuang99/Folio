@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
@@ -38,6 +39,7 @@ import com.folio.reader.data.api.GReaderEndpoints
 import com.folio.reader.ui.screens.articles.ArticleListScreen
 import com.folio.reader.ui.screens.feeds.FeedsScreen
 import com.folio.reader.ui.screens.reader.ReaderScreen
+import com.folio.reader.ui.screens.search.SearchScreen
 import com.folio.reader.ui.screens.settings.SettingsScreen
 
 /**
@@ -56,12 +58,14 @@ fun FolioScaffold(mainViewModel: MainViewModel = hiltViewModel()) {
     val isArticles = route?.startsWith("articles/") == true
     val isReader = route?.startsWith("reader/") == true
     val isSettings = route == Routes.SETTINGS
-    val canGoBack = isArticles || isReader || isSettings
+    val isSearch = route == Routes.SEARCH
+    val canGoBack = isArticles || isReader || isSettings || isSearch
     val title = when {
         route == FolioTab.Unread.route -> "Unread"
         route == FolioTab.Feeds.route -> "Feeds"
         route == FolioTab.Starred.route -> "Starred"
         isSettings -> "Settings"
+        isSearch -> "Search"
         isArticles -> Uri.decode(backStackEntry?.arguments?.getString("title").orEmpty())
         isReader -> "Article"
         else -> "Folio"
@@ -80,6 +84,9 @@ fun FolioScaffold(mainViewModel: MainViewModel = hiltViewModel()) {
                 },
                 actions = {
                     if (!canGoBack) {
+                        IconButton(onClick = { navController.navigate(Routes.SEARCH) }) {
+                            Icon(Icons.Filled.Search, contentDescription = "Search")
+                        }
                         IconButton(onClick = { menuOpen = true }) {
                             Icon(Icons.Filled.MoreVert, contentDescription = "Menu")
                         }
@@ -95,7 +102,7 @@ fun FolioScaffold(mainViewModel: MainViewModel = hiltViewModel()) {
             )
         },
         bottomBar = {
-            if (!isReader && !isSettings) {
+            if (!isReader && !isSettings && !isSearch) {
                 NavigationBar {
                     FolioTab.entries.forEach { tab ->
                         NavigationBarItem(
@@ -170,6 +177,9 @@ fun FolioScaffold(mainViewModel: MainViewModel = hiltViewModel()) {
                 ReaderScreen()
             }
             composable(Routes.SETTINGS) { SettingsScreen() }
+            composable(Routes.SEARCH) {
+                SearchScreen(onOpenArticle = { navController.navigate(Routes.reader(it)) })
+            }
         }
     }
 }

@@ -19,6 +19,7 @@ object Routes {
     const val ARTICLES = "articles/{stream}/{title}"
     const val READER = "reader/{id}"
     const val SETTINGS = "settings"
+    const val SEARCH = "search"
 
     fun articles(streamId: String, title: String): String =
         "articles/${Uri.encode(streamId)}/${Uri.encode(title)}"
