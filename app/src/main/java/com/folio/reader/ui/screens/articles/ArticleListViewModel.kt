@@ -103,8 +103,12 @@ class ArticleListViewModel @Inject constructor(
         }
     }
 
-    /** Mark read when the article is opened (best-effort; no revert on failure). */
-    fun markReadOnOpen(article: Article) {
+    /**
+     * Called when an article is opened: hand the visible ordered list to the
+     * reader (so it can swipe between siblings) and mark this one read.
+     */
+    fun openArticle(article: Article) {
+        repository.setReaderContext(_state.value.articles)
         if (article.isRead) return
         update(article.id) { it.copy(isRead = true) }
         viewModelScope.launch { repository.setRead(article.id, true) }

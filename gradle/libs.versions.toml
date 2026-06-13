@@ -16,6 +16,7 @@ activityCompose = "1.9.1"
 coreKtx = "1.13.1"
 splashscreen = "1.0.1"
 junit = "4.13.2"
+jsoup = "1.17.2"
 
 [libraries]
 # Compose
@@ -54,6 +55,9 @@ coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coi
 
 # Coroutines
 kotlinx-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
+
+# HTML parsing for the reader (MIT-licensed, FOSS)
+jsoup = { group = "org.jsoup", name = "jsoup", version.ref = "jsoup" }
 
 # Unit tests (JVM)
 junit = { group = "junit", name = "junit", version.ref = "junit" }

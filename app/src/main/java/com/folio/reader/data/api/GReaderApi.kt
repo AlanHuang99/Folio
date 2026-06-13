@@ -59,4 +59,8 @@ interface GReaderApi {
         @Field("r") remove: String?,
         @Field("T") token: String,
     ): ResponseBody
+
+    @FormUrlEncoded
+    @POST("reader/api/0/stream/items/contents?output=json")
+    suspend fun itemContents(@Field("i") itemId: String): StreamContentsResponse
 }
