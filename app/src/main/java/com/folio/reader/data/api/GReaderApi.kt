@@ -1,5 +1,8 @@
 package com.folio.reader.data.api
 
+import com.folio.reader.data.api.models.SubscriptionListResponse
+import com.folio.reader.data.api.models.TagListResponse
+import com.folio.reader.data.api.models.UnreadCountResponse
 import com.folio.reader.data.api.models.UserInfo
 import okhttp3.ResponseBody
 import retrofit2.Response
@@ -20,4 +23,13 @@ interface GReaderApi {
 
     @GET("reader/api/0/user-info?output=json")
     suspend fun userInfo(): UserInfo
+
+    @GET("reader/api/0/subscription/list?output=json")
+    suspend fun subscriptions(): SubscriptionListResponse
+
+    @GET("reader/api/0/tag/list?output=json")
+    suspend fun tags(): TagListResponse
+
+    @GET("reader/api/0/unread-count?output=json")
+    suspend fun unreadCounts(): UnreadCountResponse
 }

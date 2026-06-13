@@ -1,69 +1,108 @@
 package com.folio.reader.ui.navigation
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import android.net.Uri
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.folio.reader.ui.screens.articles.ArticlesScreen
+import com.folio.reader.ui.screens.feeds.FeedsScreen
 
 /**
- * The single app-level Scaffold. Phase 2 replaces the placeholder body with a
- * NavHost (All / Unread / Starred / by Category / by Feed) plus bottom navigation;
- * the top bar and window-inset handling stay here so insets are owned in exactly
- * one place.
+ * The single app-level Scaffold: top bar + bottom navigation + a NavHost. Window
+ * insets are owned here so child screens stay inset-agnostic.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FolioScaffold(viewModel: MainViewModel = hiltViewModel()) {
-    val userName by viewModel.userName.collectAsStateWithLifecycle()
+fun FolioScaffold(mainViewModel: MainViewModel = hiltViewModel()) {
+    val navController = rememberNavController()
+    val backStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = backStackEntry?.destination?.route
+    var menuOpen by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text("Folio") },
                 actions = {
-                    IconButton(onClick = viewModel::signOut) {
-                        Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = "Sign out")
+                    IconButton(onClick = { menuOpen = true }) {
+                        Icon(Icons.Filled.MoreVert, contentDescription = "Menu")
+                    }
+                    DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
+                        DropdownMenuItem(
+                            text = { Text("Sign out") },
+                            onClick = { menuOpen = false; mainViewModel.signOut() },
+                            leadingIcon = { Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = null) },
+                        )
                     }
                 },
             )
-        }
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .padding(horizontal = 24.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
+        },
+        bottomBar = {
+            NavigationBar {
+                FolioTab.entries.forEach { tab ->
+                    NavigationBarItem(
+                        selected = currentRoute == tab.route,
+                        onClick = {
+                            navController.navigate(tab.route) {
+                                popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        },
+                        icon = { Icon(tab.icon, contentDescription = tab.label) },
+                        label = { Text(tab.label) },
+                    )
+                }
+            }
+        },
+    ) { padding ->
+        NavHost(
+            navController = navController,
+            startDestination = FolioTab.Feeds.route,
+            modifier = Modifier.padding(padding),
         ) {
-            Text(
-                text = userName?.let { "Signed in as $it" } ?: "Signed in",
-                style = MaterialTheme.typography.titleMedium,
-            )
-            Text(
-                text = "Subscriptions and your feeds arrive in Phase 2.",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(top = 8.dp),
-            )
+            composable(FolioTab.Unread.route) { ArticlesScreen(title = "Unread") }
+            composable(FolioTab.Starred.route) { ArticlesScreen(title = "Starred") }
+            composable(FolioTab.Feeds.route) {
+                FeedsScreen(onOpenStream = { streamId, title ->
+                    navController.navigate(Routes.articles(streamId, title))
+                })
+            }
+            composable(
+                route = Routes.ARTICLES,
+                arguments = listOf(
+                    navArgument("stream") { type = NavType.StringType },
+                    navArgument("title") { type = NavType.StringType },
+                ),
+            ) { entry ->
+                val title = Uri.decode(entry.arguments?.getString("title").orEmpty())
+                ArticlesScreen(title = title)
+            }
         }
     }
 }
