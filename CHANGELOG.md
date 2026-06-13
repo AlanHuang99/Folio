@@ -6,6 +6,12 @@ versioning.
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-06-13
+
+### Added
+- Appearance switcher: nine selectable looks (Charcoal, Evergreen, Slate, Paper, Ocean, Plum, Clay, Indigo, Wine), each with an in-app theme accent and a matching launcher icon, alongside light/dark and Material You.
+- Search recent articles by title, feed, or text.
+
 ## [0.4.0] - 2026-06-13
 
 ### Added

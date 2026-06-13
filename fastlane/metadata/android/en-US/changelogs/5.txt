@@ -1,0 +1,1 @@
+New: an Appearance switcher with nine looks — each pairs an in-app theme with a matching launcher icon, alongside light/dark and Material You. Plus search across your recent articles by title, feed, or text.
