@@ -6,6 +6,16 @@ versioning.
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-06-13
+
+### Added
+- Sign in to a FreshRSS server with Google Reader API credentials; session persists and can be signed out.
+- Browse subscriptions and categories with unread counts and feed icons.
+- Navigate across All, Unread, Starred, by category, and by feed.
+- Article list with titles, feed, time, excerpt, thumbnail, and read/unread state; pull-to-refresh and paging.
+- Reader view: article HTML rendered to Compose with inline images, swipe to next/previous, star, mark read/unread, share, and open in browser.
+- Mark read/unread and star, written through to the server.
+
 ## [0.1.0] - 2026-06-13
 
 ### Added

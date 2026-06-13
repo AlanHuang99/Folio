@@ -28,6 +28,13 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      - name: Verify tag matches versionName
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          tag="${GITHUB_REF#refs/tags/}"
+          vn="$(sed -nE 's/.*versionName = "([^"]+)".*/\1/p' app/build.gradle.kts | head -n1)"
+          [ "$tag" = "v${vn}" ] || { echo "::error::tag $tag != versionName $vn"; exit 1; }
+
       - name: Lint
         run: ./gradlew lintDebug
 

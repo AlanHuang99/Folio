@@ -1,0 +1,1 @@
+Read your feeds: sign in to a FreshRSS server, browse subscriptions and categories, read articles with images in a clean reader, swipe between articles, and star or mark items read. Background sync, offline reading, and selectable themes are on the way.
