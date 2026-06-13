@@ -25,7 +25,7 @@ Rendered article (HTML → Compose, images via Coil), star, mark-read, share,
 open-in-browser, and swipe to next/previous.
 
 ## Phase 5 — Sync & offline
-Edit-tag read/star sync, background sync (WorkManager), local cache, unread badges.
+Durable read/star queue (Room) that survives offline, background sync (WorkManager) that flushes on reconnect and periodically, and unread badges. Full offline article-reading cache is still to come (recently-viewed articles are kept in memory for now).
 
 ## Phase 6 — Polish & ship
 Search, settings, and a selectable **Appearance** — pick the launcher icon and the
