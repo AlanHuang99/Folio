@@ -8,6 +8,9 @@
 # Gson
 -keepattributes Signature
 -keep class com.google.gson.** { *; }
+# Account is Gson-serialized into the accounts DataStore; keep its field names
+# stable so stored accounts survive R8 renaming and app updates.
+-keep class com.folio.reader.data.Account { *; }
 
 # OkHttp
 -dontwarn okhttp3.**

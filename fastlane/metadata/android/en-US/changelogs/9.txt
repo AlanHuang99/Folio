@@ -1,0 +1,1 @@
+Multiple accounts: sign in to more than one FreshRSS account and switch between them from Settings. Add and remove accounts; switching loads that account's feeds, folders, and articles. If you were already signed in, your account carries over automatically.

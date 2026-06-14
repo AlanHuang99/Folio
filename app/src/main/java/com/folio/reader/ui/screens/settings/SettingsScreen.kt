@@ -22,18 +22,24 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Dns
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Palette
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.PersonAdd
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -42,30 +48,54 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.folio.reader.BuildConfig
+import com.folio.reader.data.Account
 import com.folio.reader.ui.theme.Appearance
 import com.folio.reader.ui.theme.ThemeMode
 import com.folio.reader.ui.theme.ThemeViewModel
 
 @Composable
 fun SettingsScreen(
+    onAddAccount: () -> Unit,
     settingsViewModel: SettingsViewModel = hiltViewModel(),
     themeViewModel: ThemeViewModel = hiltViewModel(),
 ) {
-    val serverUrl by settingsViewModel.serverUrl.collectAsStateWithLifecycle()
-    val userName by settingsViewModel.userName.collectAsStateWithLifecycle()
+    val accounts by settingsViewModel.accounts.collectAsStateWithLifecycle()
+    val activeAccount by settingsViewModel.activeAccount.collectAsStateWithLifecycle()
     val theme by themeViewModel.prefs.collectAsStateWithLifecycle()
+    var removeTarget by remember { mutableStateOf<Account?>(null) }
 
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
-        SectionHeader("Account")
+        SectionHeader("Accounts")
+        accounts.forEach { account ->
+            val isActive = account.id == activeAccount?.id
+            ListItem(
+                headlineContent = { Text(account.userName) },
+                supportingContent = { Text(account.serverUrl) },
+                leadingContent = {
+                    RadioButton(
+                        selected = isActive,
+                        onClick = { settingsViewModel.switchAccount(account.id) },
+                    )
+                },
+                trailingContent = {
+                    IconButton(onClick = { removeTarget = account }) {
+                        Icon(
+                            Icons.Filled.Delete,
+                            contentDescription = "Remove account",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                },
+                modifier = Modifier.selectable(
+                    selected = isActive,
+                    onClick = { settingsViewModel.switchAccount(account.id) },
+                ),
+            )
+        }
         ListItem(
-            headlineContent = { Text(userName ?: "—") },
-            supportingContent = { Text("Signed in") },
-            leadingContent = { Icon(Icons.Filled.Person, contentDescription = null) },
-        )
-        ListItem(
-            headlineContent = { Text(serverUrl ?: "—") },
-            supportingContent = { Text("Server") },
-            leadingContent = { Icon(Icons.Filled.Dns, contentDescription = null) },
+            headlineContent = { Text("Add account") },
+            leadingContent = { Icon(Icons.Filled.PersonAdd, contentDescription = null) },
+            modifier = Modifier.clickable(onClick = onAddAccount),
         )
 
         HorizontalDivider()
@@ -117,17 +147,35 @@ fun SettingsScreen(
             supportingContent = { Text("A free, open-source reader for FreshRSS") },
         )
 
-        HorizontalDivider()
-        ListItem(
-            headlineContent = { Text("Sign out", color = MaterialTheme.colorScheme.error) },
-            leadingContent = {
-                Icon(
-                    Icons.AutoMirrored.Filled.Logout,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.error,
-                )
+        if (activeAccount != null) {
+            HorizontalDivider()
+            ListItem(
+                headlineContent = { Text("Sign out", color = MaterialTheme.colorScheme.error) },
+                supportingContent = { activeAccount?.let { Text(it.userName) } },
+                leadingContent = {
+                    Icon(
+                        Icons.AutoMirrored.Filled.Logout,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.error,
+                    )
+                },
+                modifier = Modifier.clickable { settingsViewModel.signOut() },
+            )
+        }
+    }
+
+    removeTarget?.let { target ->
+        AlertDialog(
+            onDismissRequest = { removeTarget = null },
+            title = { Text("Remove account?") },
+            text = { Text("Remove \"${target.userName}\" on ${target.serverUrl}? You can add it again later.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    settingsViewModel.removeAccount(target.id)
+                    removeTarget = null
+                }) { Text("Remove") }
             },
-            modifier = Modifier.clickable { settingsViewModel.signOut() },
+            dismissButton = { TextButton(onClick = { removeTarget = null }) { Text("Cancel") } },
         )
     }
 }
