@@ -48,6 +48,10 @@ class ArticleListViewModel @Inject constructor(
         _state.update { it.copy(loading = !refresh, refreshing = refresh, error = null) }
         viewModelScope.launch {
             try {
+                // On an explicit refresh, push queued star/read changes first so a
+                // just-starred article is on the server before we re-fetch (e.g. the
+                // Starred stream reflects it immediately).
+                if (refresh) runCatching { repository.flush() }
                 val page = repository.loadStream(streamId, excludeRead, continuation = null)
                 continuation = page.continuation
                 _state.update {

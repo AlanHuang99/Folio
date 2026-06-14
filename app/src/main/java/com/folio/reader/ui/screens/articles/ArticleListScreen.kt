@@ -36,7 +36,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,6 +48,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.folio.reader.data.repository.Article
@@ -55,9 +60,18 @@ fun ArticleListScreen(
     streamId: String,
     excludeRead: Boolean,
     onOpenArticle: (String) -> Unit,
+    refreshOnResume: Boolean = false,
     viewModel: ArticleListViewModel = hiltViewModel(),
 ) {
     LaunchedEffect(streamId, excludeRead) { viewModel.start(streamId, excludeRead) }
+    // For tabs whose contents change elsewhere (e.g. Starred), re-fetch when the
+    // screen is returned to — but not on the first resume, which init already covers.
+    if (refreshOnResume) {
+        var firstResume by rememberSaveable { mutableStateOf(true) }
+        LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+            if (firstResume) firstResume = false else viewModel.refresh()
+        }
+    }
     val state by viewModel.state.collectAsStateWithLifecycle()
     val pullState = rememberPullRefreshState(refreshing = state.refreshing, onRefresh = viewModel::refresh)
 

@@ -2,13 +2,16 @@ package com.folio.reader.ui.screens.feeds
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.folio.reader.data.SettingsStore
 import com.folio.reader.data.repository.SubscriptionRepository
 import com.folio.reader.data.repository.SubscriptionRepository.OpResult
 import com.folio.reader.data.repository.SubscriptionTree
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -20,11 +23,20 @@ sealed interface FeedsUiState {
 
 @HiltViewModel
 class FeedsViewModel @Inject constructor(
-    private val repository: SubscriptionRepository
+    private val repository: SubscriptionRepository,
+    private val settings: SettingsStore,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<FeedsUiState>(FeedsUiState.Loading)
     val state: StateFlow<FeedsUiState> = _state.asStateFlow()
+
+    /** Names of categories the user has folded in the Feeds screen (persisted). */
+    val collapsedCategories: StateFlow<Set<String>> =
+        settings.collapsedCategories.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptySet())
+
+    fun toggleCategoryCollapsed(name: String) {
+        viewModelScope.launch { settings.toggleCategoryCollapsed(name) }
+    }
 
     private val _refreshing = MutableStateFlow(false)
     val refreshing: StateFlow<Boolean> = _refreshing.asStateFlow()

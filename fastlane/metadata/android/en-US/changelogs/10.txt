@@ -1,0 +1,1 @@
+The Starred tab now refreshes when you return to it, so articles you just starred show up (and unstarred ones disappear) without a manual pull — pending changes are synced to the server first. You can also collapse and expand folders in the Feeds screen to save space, and the folded state is remembered.
