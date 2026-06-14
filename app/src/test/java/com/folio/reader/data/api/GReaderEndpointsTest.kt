@@ -78,4 +78,41 @@ class GReaderEndpointsTest {
             GReaderEndpoints.encodeStreamId("user/-/label/My News"),
         )
     }
+
+    @Test
+    fun `labelStreamId prefixes a category name`() {
+        assertEquals("user/-/label/Tech", GReaderEndpoints.labelStreamId("Tech"))
+        assertEquals("user/-/label/AI", GReaderEndpoints.labelStreamId("AI"))
+    }
+
+    @Test
+    fun `labelStreamId trims whitespace`() {
+        assertEquals("user/-/label/Weather", GReaderEndpoints.labelStreamId("  Weather "))
+    }
+
+    @Test
+    fun `categoryNameFromStreamId returns the trailing label`() {
+        assertEquals("Tech", GReaderEndpoints.categoryNameFromStreamId("user/-/label/Tech"))
+    }
+
+    @Test
+    fun `categoryNameFromStreamId returns null for non-label streams`() {
+        assertNull(GReaderEndpoints.categoryNameFromStreamId("feed/8"))
+    }
+
+    @Test
+    fun `normalizeFeedInput prepends https when scheme is missing`() {
+        assertEquals("https://example.com/feed", GReaderEndpoints.normalizeFeedInput("example.com/feed"))
+    }
+
+    @Test
+    fun `normalizeFeedInput keeps an existing scheme`() {
+        assertEquals("http://h/rss", GReaderEndpoints.normalizeFeedInput("  http://h/rss  "))
+        assertEquals("https://h/rss", GReaderEndpoints.normalizeFeedInput("https://h/rss"))
+    }
+
+    @Test
+    fun `normalizeFeedInput returns empty for blank input`() {
+        assertEquals("", GReaderEndpoints.normalizeFeedInput("   "))
+    }
 }

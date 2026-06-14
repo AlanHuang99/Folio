@@ -1,5 +1,6 @@
 package com.folio.reader.data.api
 
+import com.folio.reader.data.api.models.QuickAddResponse
 import com.folio.reader.data.api.models.StreamContentsResponse
 import com.folio.reader.data.api.models.SubscriptionListResponse
 import com.folio.reader.data.api.models.TagListResponse
@@ -63,4 +64,47 @@ interface GReaderApi {
     @FormUrlEncoded
     @POST("reader/api/0/stream/items/contents?output=json")
     suspend fun itemContents(@Field("i") itemId: String): StreamContentsResponse
+
+    // --- Subscription management ---
+
+    /** Subscribe to a feed by URL. FreshRSS fetches and parses it server-side. */
+    @FormUrlEncoded
+    @POST("reader/api/0/subscription/quickadd?output=json")
+    suspend fun quickAddSubscription(
+        @Field("quickadd") url: String,
+        @Field("T") token: String,
+    ): QuickAddResponse
+
+    /**
+     * Edit a subscription. `action` is "edit" (rename/move) or "unsubscribe".
+     * `title` renames; `addLabel`/`removeLabel` are full label stream ids
+     * (user/-/label/Name) to add/remove the feed's category.
+     */
+    @FormUrlEncoded
+    @POST("reader/api/0/subscription/edit")
+    suspend fun editSubscription(
+        @Field("ac") action: String,
+        @Field("s") streamId: String,
+        @Field("t") title: String?,
+        @Field("a") addLabel: String?,
+        @Field("r") removeLabel: String?,
+        @Field("T") token: String,
+    ): ResponseBody
+
+    /** Rename a category (folder). `source`/`dest` are label stream ids. */
+    @FormUrlEncoded
+    @POST("reader/api/0/rename-tag")
+    suspend fun renameTag(
+        @Field("s") source: String,
+        @Field("dest") dest: String,
+        @Field("T") token: String,
+    ): ResponseBody
+
+    /** Delete a category (folder); its feeds become uncategorized. */
+    @FormUrlEncoded
+    @POST("reader/api/0/disable-tag")
+    suspend fun disableTag(
+        @Field("s") streamId: String,
+        @Field("T") token: String,
+    ): ResponseBody
 }
