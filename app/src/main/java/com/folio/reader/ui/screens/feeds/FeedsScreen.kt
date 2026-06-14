@@ -20,6 +20,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Inbox
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.RssFeed
 import androidx.compose.material3.AlertDialog
@@ -78,6 +80,7 @@ fun FeedsScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val refreshing by viewModel.refreshing.collectAsStateWithLifecycle()
     val message by viewModel.message.collectAsStateWithLifecycle()
+    val collapsed by viewModel.collapsedCategories.collectAsStateWithLifecycle()
     val snackbarHost = remember { SnackbarHostState() }
     var dialog by remember { mutableStateOf<FeedDialog?>(null) }
 
@@ -128,24 +131,29 @@ fun FeedsScreen(
                 }
 
                 s.tree.categories.forEach { category ->
+                    val isCollapsed = category.label in collapsed
                     item(key = category.streamId) {
                         CategoryHeader(
                             label = category.label,
                             unread = category.unreadCount,
+                            collapsed = isCollapsed,
+                            onToggleCollapse = { viewModel.toggleCategoryCollapsed(category.label) },
                             onOpen = { onOpenStream(category.streamId, category.label) },
                             onRename = { dialog = FeedDialog.RenameCategory(category.label) },
                             onDelete = { dialog = FeedDialog.ConfirmDeleteCategory(category.label) },
                         )
                     }
-                    items(category.feeds, key = { it.streamId }) { feed ->
-                        FeedRow(
-                            feed = feed,
-                            currentCategory = category.label,
-                            onOpenStream = onOpenStream,
-                            onRename = { dialog = FeedDialog.RenameFeed(feed.streamId, feed.title) },
-                            onMove = { dialog = FeedDialog.MoveFeed(feed.streamId, feed.title, category.label) },
-                            onUnsubscribe = { dialog = FeedDialog.ConfirmUnsubscribe(feed.streamId, feed.title) },
-                        )
+                    if (!isCollapsed) {
+                        items(category.feeds, key = { it.streamId }) { feed ->
+                            FeedRow(
+                                feed = feed,
+                                currentCategory = category.label,
+                                onOpenStream = onOpenStream,
+                                onRename = { dialog = FeedDialog.RenameFeed(feed.streamId, feed.title) },
+                                onMove = { dialog = FeedDialog.MoveFeed(feed.streamId, feed.title, category.label) },
+                                onUnsubscribe = { dialog = FeedDialog.ConfirmUnsubscribe(feed.streamId, feed.title) },
+                            )
+                        }
                     }
                 }
 
@@ -233,6 +241,8 @@ fun FeedsScreen(
 private fun CategoryHeader(
     label: String,
     unread: Int,
+    collapsed: Boolean,
+    onToggleCollapse: () -> Unit,
     onOpen: () -> Unit,
     onRename: () -> Unit,
     onDelete: () -> Unit,
@@ -240,7 +250,14 @@ private fun CategoryHeader(
     var menu by remember { mutableStateOf(false) }
     ListItem(
         headlineContent = { Text(label, style = MaterialTheme.typography.titleMedium) },
-        leadingContent = { Icon(Icons.Filled.Folder, contentDescription = null) },
+        leadingContent = {
+            IconButton(onClick = onToggleCollapse) {
+                Icon(
+                    if (collapsed) Icons.Filled.KeyboardArrowRight else Icons.Filled.KeyboardArrowDown,
+                    contentDescription = if (collapsed) "Expand $label" else "Collapse $label",
+                )
+            }
+        },
         trailingContent = {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 CountBadge(unread)

@@ -152,6 +152,7 @@ fun FolioScaffold(mainViewModel: MainViewModel = hiltViewModel()) {
                     streamId = GReaderEndpoints.STREAM_STARRED,
                     excludeRead = false,
                     onOpenArticle = { navController.navigate(Routes.reader(it)) },
+                    refreshOnResume = true,
                 )
             }
             composable(FolioTab.Feeds.route) {

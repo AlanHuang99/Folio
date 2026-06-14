@@ -6,6 +6,14 @@ versioning.
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-06-14
+
+### Added
+- Collapse and expand folders in the Feeds screen to save space; the folded state is remembered.
+
+### Fixed
+- The Starred tab now updates when you return to it, so newly starred articles appear (and unstarred ones disappear) without a manual refresh. Pending star/read changes are pushed to the server before the list reloads.
+
 ## [0.8.0] - 2026-06-14
 
 ### Added
