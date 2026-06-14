@@ -26,6 +26,23 @@ object GReaderEndpoints {
             ?.trim()
             ?.ifEmpty { null }
 
+    /** The stream id for a category (folder) of the given name. */
+    fun labelStreamId(category: String): String = LABEL_PREFIX + category.trim()
+
+    /** The category (folder) name from a label stream id, or null if it isn't one. */
+    fun categoryNameFromStreamId(streamId: String): String? =
+        if (streamId.startsWith(LABEL_PREFIX)) streamId.removePrefix(LABEL_PREFIX) else null
+
+    /**
+     * Normalize user-entered feed input into a fetchable URL: trim it and prepend
+     * `https://` when no scheme is present. Blank input yields an empty string.
+     */
+    fun normalizeFeedInput(input: String): String {
+        val s = input.trim()
+        if (s.isEmpty()) return ""
+        return if (Regex("^[a-zA-Z][a-zA-Z0-9+.-]*://").containsMatchIn(s)) s else "https://$s"
+    }
+
     /** Percent-encode a stream id for use as a URL path, keeping '/' separators. */
     fun encodeStreamId(streamId: String): String {
         val sb = StringBuilder()

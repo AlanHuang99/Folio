@@ -6,6 +6,12 @@ versioning.
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-06-14
+
+### Added
+- Feed management from the Feeds screen: add a feed by URL (optionally into a folder), rename a feed, move it between folders, and unsubscribe. Folders can be renamed and deleted.
+- Pull-to-refresh on the Feeds screen, and an automatic refresh when you return to it, so feeds and folders changed on the server (or in the app) show up without restarting.
+
 ## [0.6.1] - 2026-06-13
 
 ### Fixed

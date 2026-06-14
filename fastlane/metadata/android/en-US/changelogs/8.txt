@@ -1,0 +1,1 @@
+Manage your feeds in the app: add a feed by URL into a folder, rename feeds, move them between folders, and unsubscribe. Rename and delete folders too. The Feeds screen now has pull-to-refresh and refreshes automatically when you return to it, so changes show up without restarting.

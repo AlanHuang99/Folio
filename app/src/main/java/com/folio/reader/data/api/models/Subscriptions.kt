@@ -6,6 +6,15 @@ import com.google.gson.annotations.SerializedName
 // array deserializes to null rather than an empty list.
 data class SubscriptionListResponse(val subscriptions: List<Subscription>? = null)
 
+// Response to subscription/quickadd. numResults is 1 when the feed was added;
+// streamId is the new feed's id (feed/N). error is set when discovery failed.
+data class QuickAddResponse(
+    val query: String? = null,
+    val numResults: Int = 0,
+    val streamId: String? = null,
+    val error: String? = null,
+)
+
 data class Subscription(
     val id: String,
     val title: String? = null,
