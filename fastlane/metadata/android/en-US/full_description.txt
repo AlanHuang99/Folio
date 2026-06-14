@@ -3,12 +3,16 @@ Folio is a reader for self-hosted RSS, built as a clean client for FreshRSS over
 <b>Features</b>
 <ul>
 <li>Connect to a self-hosted FreshRSS server using the Google Reader API</li>
+<li>Sign in to multiple accounts and switch between them</li>
 <li>Browse subscriptions and categories</li>
+<li>Manage feeds: add by URL, rename, move between folders, and unsubscribe; rename and delete folders</li>
 <li>Read by All, Unread, Starred, category, or feed</li>
 <li>Article list with feed, time, excerpt, thumbnail, and read state</li>
 <li>A clean reader view with images, share, and open in browser</li>
+<li>Reader mode: fetch the original page for the full-text article</li>
 <li>Mark read or unread and star, synced back to your server</li>
 <li>Background sync and offline reading</li>
+<li>Search recent articles by title, feed, or text</li>
 <li>A selectable appearance: choose the launcher icon and matching theme</li>
 </ul>
 

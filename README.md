@@ -25,7 +25,9 @@ Folio connects to a FreshRSS server (or any server that speaks the Google Reader
 ## Features
 
 - Connect to a self-hosted FreshRSS server with your Google Reader API credentials
+- Sign in to multiple accounts and switch between them
 - Browse subscriptions and categories — All, Unread, Starred, by category, by feed — with unread counts and feed icons
+- Manage feeds in the app: add a feed by URL, rename, move between folders, and unsubscribe; rename and delete folders
 - Article list with title, feed, time, excerpt, thumbnail, and read/unread state; pull-to-refresh and paging
 - Reader view: article HTML rendered to native text with inline images; swipe between articles; star, mark read/unread, share, open in browser
 - Reader mode: fetch the original page and read the clean, full-text article
