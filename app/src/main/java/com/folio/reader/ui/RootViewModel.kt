@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -38,4 +39,11 @@ class RootViewModel @Inject constructor(
                 else -> AuthState.LoggedOut
             }
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), AuthState.Loading)
+
+    // Drives a key() around the main UI so switching accounts rebuilds every
+    // screen and view-model with the new account's data.
+    val activeAccountId: StateFlow<String?> =
+        authRepository.activeAccountFlow
+            .map { it?.id }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 }

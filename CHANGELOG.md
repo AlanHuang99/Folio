@@ -6,6 +6,11 @@ versioning.
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-06-14
+
+### Added
+- Multiple accounts: sign in to more than one FreshRSS account and switch between them in Settings. Add and remove accounts; the active account's feeds, folders, and articles load on switch. Existing single-account sign-ins are carried over automatically.
+
 ## [0.7.0] - 2026-06-14
 
 ### Added

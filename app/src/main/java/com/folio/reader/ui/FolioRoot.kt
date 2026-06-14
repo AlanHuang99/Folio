@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -21,6 +22,11 @@ fun FolioRoot(viewModel: RootViewModel = hiltViewModel()) {
             CircularProgressIndicator()
         }
         AuthState.LoggedOut -> LoginScreen()
-        AuthState.LoggedIn -> FolioScaffold()
+        AuthState.LoggedIn -> {
+            // Re-key on the active account so switching tears down and rebuilds
+            // every screen/view-model with the new account's data.
+            val accountId by viewModel.activeAccountId.collectAsStateWithLifecycle()
+            key(accountId) { FolioScaffold() }
+        }
     }
 }

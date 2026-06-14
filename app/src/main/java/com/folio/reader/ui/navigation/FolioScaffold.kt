@@ -38,6 +38,7 @@ import androidx.navigation.navArgument
 import com.folio.reader.data.api.GReaderEndpoints
 import com.folio.reader.ui.screens.articles.ArticleListScreen
 import com.folio.reader.ui.screens.feeds.FeedsScreen
+import com.folio.reader.ui.screens.login.LoginScreen
 import com.folio.reader.ui.screens.reader.ReaderScreen
 import com.folio.reader.ui.screens.search.SearchScreen
 import com.folio.reader.ui.screens.settings.SettingsScreen
@@ -59,6 +60,7 @@ fun FolioScaffold(mainViewModel: MainViewModel = hiltViewModel()) {
     val isReader = route?.startsWith("reader/") == true
     val isSettings = route == Routes.SETTINGS
     val isSearch = route == Routes.SEARCH
+    val isAddAccount = route == Routes.ADD_ACCOUNT
     val canGoBack = isArticles || isReader || isSettings || isSearch
     val title = when {
         route == FolioTab.Unread.route -> "Unread"
@@ -73,7 +75,8 @@ fun FolioScaffold(mainViewModel: MainViewModel = hiltViewModel()) {
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
+            // The add-account route shows the login screen's own top bar.
+            if (!isAddAccount) CenterAlignedTopAppBar(
                 title = { Text(title, maxLines = 1, overflow = TextOverflow.Ellipsis) },
                 navigationIcon = {
                     if (canGoBack) {
@@ -102,7 +105,7 @@ fun FolioScaffold(mainViewModel: MainViewModel = hiltViewModel()) {
             )
         },
         bottomBar = {
-            if (!isReader && !isSettings && !isSearch) {
+            if (!isReader && !isSettings && !isSearch && !isAddAccount) {
                 NavigationBar {
                     FolioTab.entries.forEach { tab ->
                         NavigationBarItem(
@@ -176,9 +179,14 @@ fun FolioScaffold(mainViewModel: MainViewModel = hiltViewModel()) {
             ) {
                 ReaderScreen()
             }
-            composable(Routes.SETTINGS) { SettingsScreen() }
+            composable(Routes.SETTINGS) {
+                SettingsScreen(onAddAccount = { navController.navigate(Routes.ADD_ACCOUNT) })
+            }
             composable(Routes.SEARCH) {
                 SearchScreen(onOpenArticle = { navController.navigate(Routes.reader(it)) })
+            }
+            composable(Routes.ADD_ACCOUNT) {
+                LoginScreen(onClose = { navController.popBackStack() })
             }
         }
     }
